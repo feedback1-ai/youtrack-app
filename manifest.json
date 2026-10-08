@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.schemastore.org/youtrack-app.json",
+  "name": "feedback1",
+  "title": "Feedback1",
+  "description": "Show the linked Feedback1 feature on a YouTrack issue and push State changes back to Feedback1. Linking stays in Feedback1; YouTrack State never overwrites the Feedback1 roadmap status.",
+  "version": "1.0.0",
+  "url": "https://feedback1.ai",
+  "icon": "icon.svg",
+  "iconDark": "icon.svg",
+  "minYouTrackVersion": "2024.3.0",
+  "changeNotes": "1.0.0: Issue field-panel card (linked feature, votes, quotes) and on-change workflow that posts YouTrack State to Feedback1.",
+  "vendor": {
+    "name": "Feedback1",
+    "url": "https://feedback1.ai",
+    "email": "hello@feedback1.ai"
+  },
+  "widgets": [
+    {
+      "key": "issue-card",
+      "name": "Feedback1",
+      "description": "Linked Feedback1 feature, votes, and customer quotes",
+      "extensionPoint": "ISSUE_FIELD_PANEL_LAST",
+      "indexPath": "issue-card/index.html",
+      "permissions": ["READ_ISSUE"],
+      "expectedDimensions": {
+        "height": 180,
+        "width": 260
+      }
+    }
+  ]
+}
