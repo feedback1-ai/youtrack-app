@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root { color-scheme: light dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 12px;
+        line-height: 1.4;
+        color: CanvasText;
+        background: transparent;
+      }
+      .card { padding: 2px 0 6px; }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        opacity: 0.7;
+        margin-bottom: 6px;
+      }
+      .mark {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 8px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: ui-monospace, monospace;
+      }
+      .muted { opacity: 0.7; }
+      .error { color: #b45309; }
+      .title {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 4px;
+        word-break: break-word;
+      }
+      .meta { margin: 0 0 6px; opacity: 0.8; }
+      .quote {
+        margin: 0 0 6px;
+        padding-left: 8px;
+        border-left: 2px solid color-mix(in srgb, CanvasText 25%, transparent);
+        font-style: italic;
+      }
+      .quote cite {
+        display: block;
+        font-style: normal;
+        font-size: 11px;
+        opacity: 0.7;
+        margin-top: 2px;
+      }
+      a.open {
+        color: inherit;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .feature + .feature {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" class="card muted">Loading Feedback1…</div>
+    <script type="module">
+      const root = document.getElementById("root");
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function renderEmpty(message, isError) {
+        root.className = "card " + (isError ? "error" : "muted");
+        root.innerHTML =
+          '<div class="brand"><span class="mark">F1</span> Feedback1</div>' +
+          "<div>" + escapeHtml(message) + "</div>";
+      }
+
+      function renderFeature(feature) {
+        const excerpts = Array.isArray(feature.excerpts) ? feature.excerpts : [];
+        const quotes = excerpts
+          .map((item) => {
+            const account = item.account_name
+              ? `<cite>${escapeHtml(item.account_name)}</cite>`
+              : "";
+            return `<p class="quote">${escapeHtml(item.text)}${account}</p>`;
+          })
+          .join("");
+        return `
+          <div class="feature">
+            <p class="title">${escapeHtml(feature.title || "Untitled feature")}</p>
+            <p class="meta">
+              Feedback1: ${escapeHtml(feature.roadmap_status || "—")}
+              · ${Number(feature.votes_count || 0)} votes
+              · ${Number(feature.feedback_count || 0)} feedback
+            </p>
+            ${quotes}
+            <a class="open" href="${escapeHtml(feature.url)}" target="_blank" rel="noopener">Open in Feedback1</a>
+          </div>
+        `;
+      }
+
+      try {
+        const host = await YTApp.register();
+        const data = await host.fetchApp("backend/issue-context", {
+          method: "GET",
+          scope: true,
+        });
+        const payload = data && typeof data === "object" ? data : {};
+        const features = Array.isArray(payload.features) ? payload.features : [];
+        if (payload.error && features.length === 0) {
+          renderEmpty(payload.error, true);
+          return;
+        }
+        if (features.length === 0) {
+          renderEmpty("Not linked. Link this issue from a feature in Feedback1.");
+          return;
+        }
+        root.className = "card";
+        root.innerHTML =
+          '<div class="brand"><span class="mark">F1</span> Feedback1</div>' +
+          features.map(renderFeature).join("");
+      } catch (err) {
+        renderEmpty("Could not load Feedback1 for this issue.", true);
+      }
+    </script>
+  </body>
+</html>
