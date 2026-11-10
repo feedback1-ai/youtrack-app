@@ -18,19 +18,13 @@
 
 ### Linked issue card
 
-![Linked issue with Feedback1 card](docs/screenshots/linked-issue-card.png)
-
 Priority and title, feature id and **Open in Feedback1**, vote count (with feedback), revenue (`$16k` or `-`), and Feedback1 roadmap status.
 
 ### Issues list columns
 
-![Issues list with Votes and Revenue columns](docs/screenshots/issues-list-columns.png)
-
 Integer fields **👍 Votes** and **💰 Revenue** sync when an issue is opened (requires app attach + backend requirements).
 
 ### App settings
-
-![Feedback1 app settings](docs/screenshots/app-settings.png)
 
 Product-scoped API key and optional **Show revenue**.
 
