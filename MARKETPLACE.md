@@ -1,6 +1,6 @@
 # JetBrains Marketplace listing — Feedback1 YouTrack app
 
-Use this when uploading at [plugins.jetbrains.com](https://plugins.jetbrains.com/) → Build Plugins → Upload plugin.
+Upload at [plugins.jetbrains.com](https://plugins.jetbrains.com/) → Build Plugins → Upload plugin.
 
 ## Plugin details
 
@@ -8,48 +8,47 @@ Use this when uploading at [plugins.jetbrains.com](https://plugins.jetbrains.com
 |---|---|
 | Plugin for | YouTrack |
 | Name | Feedback1 |
-| Version | From `manifest.json` (e.g. 1.1.5) |
-| Min YouTrack | **2026.2.0** (`minYouTrackVersion` in manifest — three-part SemVer for Marketplace) |
-| File | `apps/feedback1-youtrack-app.zip` (run `./pack.sh`) |
+| Version | From `manifest.json` (e.g. **1.1.5**) |
+| Min YouTrack | **2026.2.0** (`minYouTrackVersion` — three-part SemVer) |
+| File | Run `./pack.sh` → `feedback1-youtrack-app.zip` (parent of this folder in monorepo) |
 | Tags | `youtrack`, `feedback`, `product-management`, `roadmap` |
-| Source code URL | https://gitlab.com/tonyzorin/feedback1 (or public repo if mirrored) |
+| Source code | https://github.com/feedback1-ai/youtrack-app |
 | License | Commercial / proprietary (Feedback1 EULA) |
 
 ## Short description
 
-Show linked Feedback1 features on YouTrack issues — votes, customer quotes, and roadmap status — and push State changes back to Feedback1.
+Show linked Feedback1 features on YouTrack issues — votes, revenue, and roadmap status — and push State changes back to Feedback1.
 
-## Long description (2–3 paragraphs)
+## Long description
 
-**Feedback1** connects customer feedback to your product roadmap. Product managers link a Feedback1 feature to a YouTrack parent issue. Engineers stay in YouTrack; they see why the work matters without switching tools.
+**Feedback1** connects customer feedback to your product roadmap. Product managers link a Feedback1 feature to a YouTrack parent issue. Engineers stay in YouTrack and see priority, demand, and roadmap status without switching tools.
 
-The **Feedback1** app adds an issue card on the field panel: priority icon, feature id and title, vote count, Feedback1 roadmap status, and **Open in Feedback1**. Linking still happens in Feedback1 — the card is read-only.
+The **Feedback1** app adds an issue card: priority and title, feature id, **Open in Feedback1**, vote count (including linked feedback), optional revenue, and Feedback1 roadmap status. Linking stays in Feedback1 — the card is read-only.
 
-When an issue's **State** changes, a workflow posts the new state to Feedback1 and updates the dev-status badge on the link. Feedback1 roadmap status stays independent: YouTrack "Verified" does not mean you have launched to customers. Install from Marketplace, attach the app to each project, and paste a Feedback1 API key in the app settings.
+Integer fields **👍 Votes** and **💰 Revenue** sync when issues are opened so you can sort the issues list. On attach, use YouTrack **Fix** to create or map those fields (required for the backend handler).
+
+When an issue's **State** changes, a workflow posts the new state to Feedback1 and updates the dev-status badge on the link. YouTrack State does not overwrite Feedback1 roadmap status.
+
+Install from Marketplace, attach the app per project, and paste a product-scoped Feedback1 API key in app settings.
+
+## Screenshots (in repo)
+
+Upload these from `docs/screenshots/`:
+
+1. `linked-issue-card.png` — linked issue card  
+2. `issues-list-columns.png` — list with Votes / Revenue  
+3. `app-settings.png` — API key + Show revenue (swap for a real capture when you have one)  
+4. Optional: `unlinked-or-error.png` — empty or requirements state  
+
+See [docs/screenshots/README.md](docs/screenshots/README.md).
 
 ## Vendor
 
-- **Organization:** Feedback1
-- **Website:** https://feedback1.ai
-- **Email:** hello@feedback1.ai
-- **Trader status:** Organization / trader (Feedback1 is a commercial SaaS vendor)
+- **Organization:** Feedback1  
+- **Website:** https://feedback1.ai  
+- **Email:** hello@feedback1.ai  
 
-## Legal (required for approval)
+## Legal
 
-- Accept [JetBrains Marketplace Developer Agreement](https://www.jetbrains.com/legal/docs/plugins_site/developer-agreement/)
-- Provide Feedback1 **Developer EULA** (commercial terms)
-- Provide **Privacy policy** URL (app stores API key and calls Feedback1)
-- Declare trader/non-trader per [Marketplace trader status](https://plugins.jetbrains.com/docs/marketplace/trader-status.html)
-
-## Screenshots (capture after Cloud sandbox test)
-
-1. Linked issue with card showing priority, votes, and roadmap status
-2. App settings with Feedback1 API key field only
-3. Unlinked issue empty state
-
-## Cloud sandbox checklist (before upload)
-
-1. Register `yourname.youtrack.cloud` at [YouTrack Cloud](https://www.jetbrains.com/youtrack/cloud/new-youtrack-cloud-instances.html)
-2. Connect in Feedback1 staging; link one test feature
-3. `./pack.sh` → Administration → Apps → Upload ZIP → attach project
-4. Paste staging API key; open linked issue; change State; confirm badge updates
+- [JetBrains Marketplace Developer Agreement](https://www.jetbrains.com/legal/docs/plugins_site/developer-agreement/)
+- Feedback1 Developer EULA + privacy policy (API key stored in YouTrack; calls `https://app.feedback1.ai`)

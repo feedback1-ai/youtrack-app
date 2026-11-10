@@ -1,31 +1,77 @@
-# Feedback1 YouTrack app
+<p align="center">
+  <img src="icon.svg" width="64" height="64" alt="Feedback1" />
+</p>
 
-Issue card plus a State-change workflow. Linking still happens in Feedback1. Requires YouTrack 2026.2.0+ (async HTTP).
+<h1 align="center">Feedback1 for YouTrack</h1>
+
+<p align="center">
+  Show linked Feedback1 features on issues — votes, revenue, roadmap status — and push YouTrack State back to Feedback1.
+</p>
+
+<p align="center">
+  <strong>YouTrack 2026.2.0+</strong> · App package <strong>1.1.5</strong>
+</p>
+
+---
+
+## Screenshots
+
+### Linked issue card
+
+![Linked issue with Feedback1 card](docs/screenshots/linked-issue-card.png)
+
+Priority and title, feature id and **Open in Feedback1**, vote count (with feedback), revenue (`$16k` or `-`), and Feedback1 roadmap status.
+
+### Issues list columns
+
+![Issues list with Votes and Revenue columns](docs/screenshots/issues-list-columns.png)
+
+Integer fields **👍 Votes** and **💰 Revenue** sync when an issue is opened (requires app attach + backend requirements).
+
+### App settings
+
+![Feedback1 app settings](docs/screenshots/app-settings.png)
+
+Product-scoped API key and optional **Show revenue**.
+
+---
 
 ## Install
 
-1. In Feedback1: Settings → API Keys → create a key for the product you map to YouTrack.
-2. In Feedback1: Settings → Integrations → YouTrack → connect with a permanent token. Link features to parent issues. Linking adds a `feedback1` tag on the issue.
-3. Pack: `./pack.sh` writes `apps/feedback1-youtrack-app.zip`.
-4. YouTrack: Administration → Apps → Upload ZIP. Attach the app to each project. When YouTrack flags **backend** requirements, use **Fix** to create or map integer fields **👍 Votes** and **💰 Revenue** (the issue card stays off until those requirements are green).
-5. Paste the Feedback1 API key; optionally enable **Show revenue**. List revenue is written only when **Show revenue** is on and ARR is greater than zero; the card always shows **💰** as `$16k` or `-`. Legacy field names `F1 Votes` / `F1 Revenue` still work as write fallbacks.
-6. If the project renamed its State field, map the State-type field when YouTrack asks.
+1. In Feedback1: **Settings → API Keys** — create a key for the product you map to YouTrack.
+2. In Feedback1: **Settings → Integrations → YouTrack** — connect with a permanent token. Link features to parent issues (adds a `feedback1` tag on the issue).
+3. Pack: `./pack.sh` → upload `feedback1-youtrack-app.zip` in **YouTrack → Administration → Apps** (or install from [Marketplace](https://plugins.jetbrains.com/plugin/youtrack_app) when published).
+4. Attach the app to each project. If YouTrack flags **backend** requirements, use **Fix** to create or map **👍 Votes** and **💰 Revenue** (integer).
+5. Paste the Feedback1 API key; optionally enable **Show revenue**.
+6. Map **State** when the State workflow prompts you.
 
-Install from [JetBrains Marketplace](https://plugins.jetbrains.com/youtrack_app) once published, or upload the zip manually on Cloud or Server.
+Full integration guide: [feedback1.ai/docs/integrations/youtrack](https://feedback1.ai/docs/integrations/youtrack)
+
+---
 
 ## What it does
 
-- **Card** (issue field panel): priority and title on the first row; feature id and Open in Feedback1 on the second; then votes, revenue, and roadmap status.
-- **Issues list**: columns **👍 Votes** / **💰 Revenue** (synced when the issue is opened/refreshed). If `fetchApp` fails, use **Fix** on backend requirements or check the API key.
-- **Workflow**: when State changes on an issue tagged `feedback1`, POST the new state to Feedback1. That updates the link badge only, not the Feedback1 feature state.
-- **Poll** in Feedback1 still runs as a backup.
+- **Card** (issue field panel): priority + title; feature id + open link; votes, revenue, Feedback1 roadmap status.
+- **Issues list**: **👍 Votes** / **💰 Revenue** updated on issue open (not live for every row until visited).
+- **Workflow**: when **State** changes on a `feedback1`-tagged issue, POST to Feedback1 → updates link badge only (not Feedback1 roadmap status).
+- **Poll** in Feedback1 remains a fallback if the app is not installed.
 
-## Cloud sandbox test
+---
 
-1. Register a free instance at [YouTrack Cloud](https://www.jetbrains.com/youtrack/cloud/new-youtrack-cloud-instances.html) (for example `yourname.youtrack.cloud`).
-2. Connect that URL in Feedback1 staging, link a test feature, create an API key, upload the zip, attach to a project, paste settings.
-3. Open a linked issue and confirm the card shows votes; change State and confirm the Feedback1 link badge updates.
+## Development
 
-## Card shows “taking longer than usual”
+| Path | Role |
+|------|------|
+| `backend.js` | Issue-context HTTP handler + list field sync |
+| `push-state.js` | State → Feedback1 workflow |
+| `widgets/issue-card/` | Issue panel widget |
+| `MARKETPLACE.md` | Listing copy for JetBrains |
+| `pack.sh` | Zip for upload (see `.gitignore` for local zip) |
 
-The YouTrack backend caches Feedback1 responses on the issue: **60s** when linked, **15s** when unlinked (so a new link appears within ~15s without a long stale “not linked”). Re-upload the app zip after upgrades. If it persists, check the API key is for the correct product and that `https://app.feedback1.ai` is reachable from YouTrack Cloud.
+Requires YouTrack **2026.2.0+** for async HTTP from the handler.
+
+---
+
+## Vendor
+
+**[Feedback1](https://feedback1.ai)** · hello@feedback1.ai

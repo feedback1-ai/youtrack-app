@@ -1,0 +1,25 @@
+name: Validate manifest
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  semver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check minYouTrackVersion is three-part SemVer
+        run: |
+          python3 - <<'PY'
+          import json, re, sys
+          with open("manifest.json") as f:
+              m = json.load(f)
+          v = m.get("minYouTrackVersion", "")
+          if not re.match(r"^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$", v):
+              print(f"Invalid minYouTrackVersion: {v!r}", file=sys.stderr)
+              sys.exit(1)
+          print(f"OK minYouTrackVersion={v}")
+          PY
