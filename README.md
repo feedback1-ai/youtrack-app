@@ -18,13 +18,19 @@
 
 ### Linked issue card
 
+![Feature linked to a YouTrack issue](docs/screenshots/linked-feature-youtrack.png)
+
 Priority and title, feature id and **Open in Feedback1**, vote count (with feedback), revenue (`$16k` or `-`), and Feedback1 roadmap status.
 
 ### Issues list columns
 
+![Issues list with Votes and Revenue columns](docs/screenshots/issues-list-columns.png)
+
 Integer fields **👍 Votes** and **💰 Revenue** sync when an issue is opened (requires app attach + backend requirements).
 
 ### App settings
+
+![YouTrack connection in Feedback1 settings](docs/screenshots/youtrack-integration-settings.png)
 
 Product-scoped API key and optional **Show revenue**.
 
