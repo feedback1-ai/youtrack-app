@@ -33,13 +33,6 @@ Install from Marketplace, attach the app per project, and paste a product-scoped
 
 ## Screenshots (in repo)
 
-Upload these from `docs/screenshots/`:
-
-1. `linked-issue-card.png` — linked issue card  
-2. `issues-list-columns.png` — list with Votes / Revenue  
-3. `app-settings.png` — API key + Show revenue (swap for a real capture when you have one)  
-4. Optional: `unlinked-or-error.png` — empty or requirements state  
-
 See [docs/screenshots/README.md](docs/screenshots/README.md).
 
 ## Vendor
