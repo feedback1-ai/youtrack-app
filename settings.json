@@ -4,18 +4,17 @@
   "title": "Feedback1",
   "description": "API key from Feedback1 Settings → API Keys. Use the product you map to this YouTrack.",
   "properties": {
-    "baseUrl": {
-      "title": "Feedback1 URL",
-      "type": "string",
-      "description": "Origin only, for example https://app.feedback1.ai",
-      "default": "https://app.feedback1.ai",
-      "x-scope": "GLOBAL"
-    },
     "apiKey": {
       "title": "Feedback1 API key",
       "type": "string",
       "format": "secret",
       "description": "Bearer key (apikey_…). Stored only for YouTrack HTTP calls, not in the widget.",
+      "x-scope": "GLOBAL"
+    },
+    "showRevenue": {
+      "title": "Show revenue",
+      "type": "boolean",
+      "description": "Show linked-account revenue on the issue card and sync the F1 Revenue column (whole dollars). Votes sync either way.",
       "x-scope": "GLOBAL"
     }
   },

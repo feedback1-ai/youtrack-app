@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://unpkg.com/@jetbrains/ring-ui-built@6/components/style.css" />
+    <style>
+      :root { color-scheme: light; }
+      :root.ring-ui-theme-dark, .ring-ui-theme-dark { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: var(--ring-font-family, system-ui, -apple-system, 'Segoe UI', sans-serif);
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--ring-text-color, #1f2326);
+        background: transparent;
+      }
+      .card { padding: 2px 0 6px; }
+      .muted { opacity: 0.7; }
+      .error { color: var(--ring-warning-color, #b45309); }
+      .title-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 0 6px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.35;
+      }
+      .title-row .prio {
+        flex-shrink: 0;
+        line-height: 0;
+      }
+      .fid {
+        flex-shrink: 0;
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 600;
+        opacity: 0.75;
+        line-height: 1;
+      }
+      .fname {
+        min-width: 0;
+        flex: 1;
+        word-break: break-word;
+      }
+      .meta { margin: 0 0 6px; opacity: 0.8; font-size: 12px; }
+      .meta p { margin: 0; }
+      .meta p + p { margin-top: 2px; }
+      .status { white-space: nowrap; }
+      .id-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 0 0 6px;
+      }
+      .id-row .fid { flex: 1; min-width: 0; }
+      a.open {
+        color: inherit;
+        font-weight: 600;
+        font-size: 12px;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .id-row a.open {
+        flex-shrink: 0;
+        display: inline-block;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.3;
+        text-decoration: none;
+        border-radius: 4px;
+        border: 1px solid var(--ring-line-color, rgba(31, 35, 38, 0.2));
+        background: var(--ring-content-background-color, rgba(31, 35, 38, 0.04));
+      }
+      .id-row a.open:hover {
+        background: var(--ring-line-color, rgba(31, 35, 38, 0.08));
+      }
+      .feature + .feature {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--ring-line-color, rgba(31, 35, 38, 0.12));
+      }
+      .empty-msg { margin: 0 0 4px; }
+      .product-hint { margin: 0 0 6px; font-size: 11px; opacity: 0.65; }
+    </style>
+  </head>
+  <body>
+    <div id="root" class="card muted"><p class="empty-msg">Checking link…</p></div>
+    <script type="module">
+      const root = document.getElementById('root');
+
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function productHintHtml(product) {
+        if (!product || !product.pub_id) return '';
+        return `<p class="product-hint">API key product: ${escapeHtml(product.pub_id)}</p>`;
+      }
+
+      function priorityMeta(raw) {
+        const p = String(raw || '').trim().toLowerCase();
+        const map = {
+          highest: { label: 'Highest', color: '#dc2626', kind: 'double-up' },
+          critical: { label: 'Critical', color: '#dc2626', kind: 'double-up' },
+          high: { label: 'High', color: '#ea580c', kind: 'up' },
+          medium: { label: 'Medium', color: '#f59e0b', kind: 'equal' },
+          low: { label: 'Low', color: '#3b82f6', kind: 'down' },
+          lowest: { label: 'Lowest', color: '#3b82f6', kind: 'double-down' },
+          urgent: { label: 'Critical', color: '#dc2626', kind: 'double-up' },
+          blocker: { label: 'Highest', color: '#dc2626', kind: 'double-up' },
+        };
+        return map[p] || null;
+      }
+
+      function prioritySvg(meta) {
+        if (!meta) return '';
+        const c = meta.color;
+        const up = `<path fill="${c}" d="M7 3L3 8h3v4h2V8h3L7 3z"/>`;
+        const down = `<path fill="${c}" d="M7 13L3 8h3V4h2v4h3L7 13z"/>`;
+        const eq = `<rect fill="${c}" x="3" y="7" width="8" height="2" rx="0.5"/>`;
+        let body = '';
+        if (meta.kind === 'double-up') body = up + `<g transform="translate(0,3)">${up}</g>`;
+        else if (meta.kind === 'up') body = up;
+        else if (meta.kind === 'double-down') body = down + `<g transform="translate(0,-3)">${down}</g>`;
+        else if (meta.kind === 'down') body = down;
+        else body = eq;
+        return (
+          `<svg class="prio" width="14" height="14" viewBox="0 0 14 14" role="img" aria-label="Priority: ${escapeHtml(meta.label)}" title="Priority: ${escapeHtml(meta.label)}">${body}</svg>`
+        );
+      }
+
+      const SETTINGS_HINT =
+        'Check Administration → Apps → Feedback1 settings (API key).';
+      const HANDLER_REQUIREMENTS_HINT =
+        'Could not load Feedback1. In Administration → Apps → Feedback1 on this project, use Fix on the backend handler to create or map integer fields 👍 Votes and 💰 Revenue. Also verify the API key in app settings.';
+
+      function errorWithSettingsHint(message) {
+        const base = String(message || '').trim();
+        if (!base || base.includes('Set the Feedback1 API key')) {
+          return base || SETTINGS_HINT;
+        }
+        return base + ' ' + SETTINGS_HINT;
+      }
+
+      function displayRevenue(value) {
+        if (value == null || value === '' || Number.isNaN(Number(value))) {
+          return '-';
+        }
+        const n = Number(value);
+        if (n <= 0) {
+          return '-';
+        }
+        return formatRevenue(n);
+      }
+
+      function renderEmpty(message, isError, productUrl, product) {
+        root.className = 'card ' + (isError ? 'error' : 'muted');
+        const link =
+          productUrl
+            ? `<a class="open" href="${escapeHtml(productUrl)}" target="_blank" rel="noopener">Open in Feedback1</a>`
+            : '';
+        root.innerHTML =
+          `<p class="empty-msg">${escapeHtml(message)}</p>` +
+          productHintHtml(product) +
+          link;
+      }
+
+      function displayTitle(raw) {
+        const t = String(raw || '').trim();
+        if (t && !/\s/.test(t) && t.includes('-')) {
+          return t.replace(/-/g, ' ').replace(/^\S/, (ch) => ch.toUpperCase());
+        }
+        return t || 'Untitled feature';
+      }
+
+      function formatRevenue(value) {
+        const n = Number(value) || 0;
+        if (n >= 1000000) {
+          return '$' + (n / 1000000).toFixed(1) + 'M';
+        }
+        if (n >= 1000) {
+          return '$' + (n / 1000).toFixed(0) + 'k';
+        }
+        return '$' + n;
+      }
+
+      function renderFeature(feature) {
+        const prio = priorityMeta(feature.priority);
+        const prioHtml = prioritySvg(prio);
+        const pub = feature.pub_id ? `F${escapeHtml(feature.pub_id)}` : '';
+        const votes = Number(feature.votes_count || 0);
+        const feedback = Number(feature.feedback_count || 0);
+        const status = escapeHtml(feature.roadmap_status || '—');
+        const revenueLine = escapeHtml(displayRevenue(feature.revenue));
+        const idRow =
+          pub || feature.url
+            ? `<div class="id-row">
+                ${pub ? `<span class="fid">${pub}</span>` : '<span></span>'}
+                <a class="open" href="${escapeHtml(feature.url)}" target="_blank" rel="noopener">Open in Feedback1</a>
+              </div>`
+            : '';
+        return `
+          <div class="feature">
+            <div class="title-row">
+              ${prioHtml}
+              <span class="fname">${escapeHtml(displayTitle(feature.title))}</span>
+            </div>
+            ${idRow}
+            <div class="meta">
+              <p>👍 ${votes} vote${votes === 1 ? '' : 's'} (including 💬 ${feedback} feedback)</p>
+              <p>💰 ${revenueLine}</p>
+              <p class="status">📌 Status: ${status}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      function render(payload) {
+        const features = Array.isArray(payload.features) ? payload.features : [];
+        const product = payload.product || null;
+        const productUrl = product && product.url;
+        if (payload.error && features.length === 0) {
+          renderEmpty(errorWithSettingsHint(payload.error), true, productUrl, product);
+        } else if (features.length === 0) {
+          renderEmpty(
+            'No feature linked. Open a feature in Feedback1 and attach this issue.',
+            false,
+            productUrl,
+            product
+          );
+        } else {
+          root.className = 'card';
+          root.innerHTML = features.map((f) => renderFeature(f)).join('');
+        }
+      }
+
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      function renderChecking() {
+        root.className = 'card muted';
+        root.innerHTML = '<p class="empty-msg">Checking link…</p>';
+      }
+
+      async function main() {
+        const host = await YTApp.register();
+        renderChecking();
+        let lastPayload = {};
+        for (let attempt = 0; attempt < 8; attempt++) {
+          const data = await host.fetchApp('backend/issue-context', {
+            method: 'GET',
+            scope: true,
+          });
+          const payload = data && typeof data === 'object' ? data : {};
+          lastPayload = payload;
+          const features = Array.isArray(payload.features) ? payload.features : [];
+          const waiting = Boolean(payload.pending) || (Boolean(payload.refreshing) && features.length === 0);
+          if (!waiting) {
+            render(payload);
+            return;
+          }
+          await sleep(800 + attempt * 400);
+        }
+        const product = lastPayload.product || null;
+        const productUrl = product && product.url;
+        if (lastPayload.error) {
+          renderEmpty(errorWithSettingsHint(lastPayload.error), true, productUrl, product);
+        } else {
+          renderEmpty(
+            errorWithSettingsHint(
+              'Feedback1 is taking longer than usual. Reload the issue to retry.'
+            ),
+            true,
+            productUrl,
+            product
+          );
+        }
+      }
+
+      main().catch(() => {
+        renderEmpty(HANDLER_REQUIREMENTS_HINT, true);
+      });
+    </script>
+  </body>
+</html>
